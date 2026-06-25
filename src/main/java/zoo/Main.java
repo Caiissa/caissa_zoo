@@ -3,6 +3,7 @@ package zoo;
 import zoo.animal.*;
 import zoo.enclosure.*;
 
+import java.util.List;
 import java.util.Map;
 import java.util.logging.*;
 
@@ -10,10 +11,22 @@ public class Main {
 
   public static void main(String[] args) {
 
+    // Logger konfigurieren: alle Level an, einfaches Format
+    Logger zooLogger = Logger.getLogger(Zoo.class.getName());
+    zooLogger.setUseParentHandlers(false);
+
+    ConsoleHandler handler = new ConsoleHandler();
+    handler.setFormatter(new SimpleFormatter());
+
+    // Start mit INFO
+    handler.setLevel(Level.INFO);
+    zooLogger.setLevel(Level.INFO);
+    zooLogger.addHandler(handler);
+
     // Zoo befüllen
     Zoo zoo = new Zoo();
 
-    Aquarium aquarium = new Aquarium("Großes Aquarium");
+    Aquarium aquarium = new Aquarium("Aquarium");
     aquarium.add(new Goldfish("Trixi"));
     aquarium.add(new Goldfish("Toni"));
     aquarium.add(new Clownfish("Nemo"));
@@ -58,5 +71,22 @@ public class Main {
     System.out.println("\n--- Gehege suchen: 'Aquarium XYZ' (nicht vorhanden) ---");
     var notFound = zoo.findEnclosureByName("Aquarium XYZ");
     System.out.println("  Ergebnis: " + notFound);
+
+    // Log-Level auf FINE umschalten – Zustandsinfos sichtbar
+    System.out.println("\n=== Log-Level: FINE  ===");
+    handler.setLevel(Level.FINE);
+    zooLogger.setLevel(Level.FINE);
+
+    System.out.println("--- getAllAnimals mit FINE-Logging ---");
+    List<Animal> all = zoo.getAllAnimals();
+    System.out.println("  Tiere gesamt: " + all.size());
+
+    // Log-Level auf WARNING – nur Warnungen
+    System.out.println("\n=== Log-Level: WARNING ===");
+    handler.setLevel(Level.WARNING);
+    zooLogger.setLevel(Level.WARNING);
+
+    System.out.println("--- Suche nach nicht existentem Gehege ---");
+    zoo.findEnclosureByName("Phantomgehege");
   }
 }
