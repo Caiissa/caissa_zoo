@@ -17,6 +17,10 @@ public class Enclosure<T extends Animal> {
     this.name = name;
   }
 
+  public String getName() {
+    return name;
+  }
+
   public boolean add(T animal) {
     return inhabitants.add(animal);
   }
@@ -27,5 +31,14 @@ public class Enclosure<T extends Animal> {
 
   public List<T> getInhabitants() {
     return List.copyOf(inhabitants);
+  }
+
+  public int size() {
+    return inhabitants.size();
+  }
+
+  @Override
+  public String toString() {
+    return "Enclosure[name=" + name + ", inhabitants=" + inhabitants.size() + "]";
   }
 }
