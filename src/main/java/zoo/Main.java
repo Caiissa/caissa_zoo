@@ -1,11 +1,13 @@
 package zoo;
 
-import zoo.animal.*;
-import zoo.enclosure.*;
-
-import java.util.List;
 import java.util.Map;
 import java.util.logging.*;
+import zoo.animal.*;
+import zoo.command.AddAnimalCommand;
+import zoo.command.Command;
+import zoo.command.CommandManager;
+import zoo.command.RemoveAnimalCommand;
+import zoo.enclosure.*;
 
 public class Main {
 
@@ -58,35 +60,51 @@ public class Main {
 
     System.out.println("\n--- Tiere nach Praedikat (Name enthaelt 'e') ---");
     zoo.getAnimalsByPredicate(a -> a.name().toLowerCase().contains("e"))
-            .forEach(a -> System.out.println("  " + a));
+        .forEach(a -> System.out.println("  " + a));
 
     System.out.println("\n--- Tiertypen-Zaehlung ---");
     Map<String, Long> counts = zoo.countAnimalsByType();
     counts.forEach((type, count) -> System.out.println("  " + type + ": " + count));
 
     System.out.println("\n--- Ueberfuellte Gehege (> 2 Tiere) ---");
-    zoo.getOvercrowdedEnclosures(2)
-            .forEach(e -> System.out.println("  " + e));
+    zoo.getOvercrowdedEnclosures(2).forEach(e -> System.out.println("  " + e));
 
     System.out.println("\n--- Gehege suchen: 'Aquarium XYZ' (nicht vorhanden) ---");
     var notFound = zoo.findEnclosureByName("Aquarium XYZ");
     System.out.println("  Ergebnis: " + notFound);
 
-    // Log-Level auf FINE umschalten – Zustandsinfos sichtbar
-    System.out.println("\n=== Log-Level: FINE  ===");
-    handler.setLevel(Level.FINE);
-    zooLogger.setLevel(Level.FINE);
+    // CommandManager demonstrieren
+    System.out.println("\n--- Alle Reptilen vor AddAnimalCommand ---");
+    zoo.getAllReptile().forEach(r -> System.out.println(" " + r));
 
-    System.out.println("--- getAllAnimals mit FINE-Logging ---");
-    List<Animal> all = zoo.getAllAnimals();
-    System.out.println("  Tiere gesamt: " + all.size());
+    CommandManager<Enclosure<Reptile>> manager = new CommandManager<>();
+    Command<Enclosure<Reptile>> command = new AddAnimalCommand<>(new Turtel("Peter"));
+    manager.executeCommand(command, terrarium);
+    System.out.println("\n--- Alle Reptilen nach AddAnimalCommand ---");
+    zoo.getAllReptile().forEach(r -> System.out.println(" " + r));
 
-    // Log-Level auf WARNING – nur Warnungen
-    System.out.println("\n=== Log-Level: WARNING ===");
-    handler.setLevel(Level.WARNING);
-    zooLogger.setLevel(Level.WARNING);
+    manager.undo(terrarium);
+    System.out.println("\n--- Alle Reptilen nach undo ---");
+    zoo.getAllReptile().forEach(r -> System.out.println(" " + r));
 
-    System.out.println("--- Suche nach nicht existentem Gehege ---");
-    zoo.findEnclosureByName("Phantomgehege");
+    manager.redo(terrarium);
+    System.out.println("\n--- Alle Reptilen nach redo ---");
+    zoo.getAllReptile().forEach(r -> System.out.println(" " + r));
+
+    System.out.println("\n--- Alle Reptilen vor AddAnimalCommand ---");
+    zoo.getAllReptile().forEach(r -> System.out.println(" " + r));
+
+    command = new RemoveAnimalCommand<>(new Turtel("Peter"));
+    manager.executeCommand(command, terrarium);
+    System.out.println("\n--- Alle Reptilen nach AddAnimalCommand ---");
+    zoo.getAllReptile().forEach(r -> System.out.println(" " + r));
+
+    manager.undo(terrarium);
+    System.out.println("\n--- Alle Reptilen nach undo ---");
+    zoo.getAllReptile().forEach(r -> System.out.println(" " + r));
+
+    manager.redo(terrarium);
+    System.out.println("\n--- Alle Reptilen nach redo ---");
+    zoo.getAllReptile().forEach(r -> System.out.println(" " + r));
   }
 }

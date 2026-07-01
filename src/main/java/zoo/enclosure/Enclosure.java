@@ -2,6 +2,7 @@ package zoo.enclosure;
 
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import zoo.animal.Animal;
 
@@ -35,6 +36,10 @@ public class Enclosure<T extends Animal> {
 
   public int size() {
     return inhabitants.size();
+  }
+
+  public Optional<T> findAnimalByName(String animalName) {
+    return getInhabitants().stream().filter(t -> animalName.equals(t.name())).findFirst();
   }
 
   @Override
